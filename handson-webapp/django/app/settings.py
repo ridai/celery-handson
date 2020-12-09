@@ -122,3 +122,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "asset"),
 )
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient'
+        }
+    }
+}
+
+
+CELERY_BROKER_URL = "redis://redis:6379/1"
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
