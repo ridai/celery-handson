@@ -14,7 +14,7 @@
 単純なリクエストエンドポイントを叩いて、ロジックの実行をX秒待たせる<br>
 X秒間レスポンス待ちが発生することを確認する<br>
 構成イメージは以下の通り<br>
-<img width="500" src="https://user-images.githubusercontent.com/2268153/101658520-72262d80-3a88-11eb-828c-0ae43bf433a3.png">
+<img width="500" src="https://user-images.githubusercontent.com/2268153/101658520-72262d80-3a88-11eb-828c-0ae43bf433a3.png"><br>
 今回は、動作の説明のために、djangoのserverを **シングルスレッド** かつ **1プロセス** での動作を行っている。
 
 ### 手順
@@ -51,12 +51,56 @@ views.pyにて、ボタンを押した際のエンドポイントが`TaskStep1` 
 処理時間がかかるような処理をフロントで待ち続けないように & フロントエンドサーバのリソースを食いつぶさないためにも、別コンテナでの非同期処理を導入する<br>
 celery + redisの登場<br>
 構成イメージは以下の通り<br>
-<img width="500" src="https://user-images.githubusercontent.com/2268153/101657990-e3191580-3a87-11eb-8518-604e66f03830.png">
+<img width="500" src="https://user-images.githubusercontent.com/2268153/101657990-e3191580-3a87-11eb-8518-604e66f03830.png"><br>
+taskを実行するbackendサーバに、djangoに組み込むことが用意な`Celery`を利用している。<br>
+非同期処理を実行するbackendサーバにtaskの実行命令をpushするために、brokerと呼ばれるメッセージのqueueingシステムが必要になる。今回は`Redis`を利用している。<br>
+backendサーバでのtask実行結果を格納する必要がある。今回は`Redis`を利用しているが、`MySQL`等も選択可能である。<br>
 
-今回も、動作の説明のために、djangoのserverを **シングルスレッド** かつ **1プロセス** での動作を行っている。
+また、今回も、動作の説明のために、djangoのserverを **シングルスレッド** かつ **1プロセス** での動作を行っている。
 
 ### 手順
 1. 以下のブランチをチェックアウトする
 ```shell
 git checkout -b step2 oring/step2
 ```
+
+### 解説
+1. 非同期処理の導入手順
+    1. Redisをbrokerとして利用するため、redis serviceを用意する。
+    docker-composeを以下のように修正。
+    ```
+    redis:
+     image: redis:6.0.9
+    ```
+    また、djangoにおいて、brokerとして認識させる。
+    appのsettings.pyに以下設定を追加。
+    ```
+    CELERY_BROKER_URL = "redis://redis:6379/1"
+    ```
+
+    2. Celeryの利用にあたっては
+        1. taskロジック自体はdjangoに組み込まれているため、handson-webapp serviceと同じく、djangoのimageをbuildしたcelery serviceを用意する。
+        docker-composeを以下のように修正。
+        ```
+          celery:
+            build:
+              context: ./handson-webapp
+              args:
+                BUILD_TAG: 3.7
+
+        ```
+
+        1. 非同期処理を実行するプロセスをdaemonとして立ち上げるためには、celeryの機能を使って以下コマンドを叩く。
+        docker-composeを以下のように修正。
+        ```
+            command: celery -A app worker --concurrency=1 -l info
+        ```
+        concurrencyは並列処理数。今回はお試しなので 1。
+
+    3. 実行結果の格納先情報を記載する。
+    appのsettings.pyに以下設定を追加。
+    ```
+    CELERY_RESULT_BACKEND = 'redis://redis:6379'
+    ```
+    
+    
