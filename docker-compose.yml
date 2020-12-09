@@ -7,7 +7,7 @@ services:
         BUILD_TAG: 3.7
     container_name: handson-webapp
     image: handson-webapp:1.0
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver --nothreading 0.0.0.0:8000
     environment:
       - WORK_DIR=/home/handson-webapp
       - HOME=/home/handson-webapp
