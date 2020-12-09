@@ -1,0 +1,46 @@
+{% extends 'base_dashboard.html' %}
+
+{% block content %}
+<div id="content">
+  <div class="container">
+    <div class="login-footer">
+      <p>Project List</p>
+    </div> 
+    <table class="table table-hover table-responsive">
+      <thead class="thead-light">
+      <tr>
+        <th></th>
+        <th>Project ID</th>
+        <th>Project Name</th>
+        <th>Project Owner</th>
+        <th></th>
+      </tr>
+      </thead>
+      {% for obj in object_list %}
+      <tr>
+        <th>
+          <form method="GET" action="{% url 'project_detail' %}" name="project_select_{{ forloop.counter }}">
+            {% csrf_token %}
+            <input name="project_id" value="{{ obj.uuid }}" type="hidden">
+            <input type="radio" value="" onclick="document.project_select_{{ forloop.counter }}.submit();">
+          </form>
+        </th>
+        <th>{{ obj.uuid }}</th>
+        <th>{{ obj.name }}</th>
+        <th>{{ obj.user.display_name }}</th>
+        <th>
+          <form method="POST" action="{% url 'project_delete' %}">
+            {% csrf_token %}
+            <input name="project_id" value="{{ obj.uuid }}" type="hidden">
+            <button type="submit" class="btn btn-outline-danger">Delete</button>
+          </form>
+        </th>
+      </tr>
+      {% endfor %}
+    </table>
+    <form method="GET" action="{% url 'project_create' %}">
+      <button type="submit" class="btn btn-outline-primary">Create Project</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

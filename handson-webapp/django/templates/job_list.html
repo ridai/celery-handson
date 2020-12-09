@@ -1,0 +1,146 @@
+{% extends 'base_dashboard.html' %}
+{% load filter %}
+
+{% block content %}
+<div class="container">
+    <div class="login-footer">
+      <p>Job List</p>
+    </div> 
+
+    <div class="accordion" id="accordion-4">
+        <div class="card">
+            <div class="card-header" id="header-4a">
+                <button class="btn btn-link" type="button"
+                    data-toggle="collapse" data-target="#card-4a"
+                    aria-expanded="true" aria-controls="card-4a">Set Job
+                </button>
+            </div>
+            <div id="card-4a" class="collapse"
+                aria-labelledby="header-4a" data-parent="#accordion-4">
+                <form method="POST" action="{% url 'job_set' %}" name="job_set">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading strong">Chunked Dataset List</div>
+                                    <div class="panel-body text-right">
+                                        <table class="table table-hover table-responsive chunked_dataset_table">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>
+                                                        <label><input type="checkbox" id="chunked_dataset_check_all" /></label>
+                                                    </th>
+                                                    <th>Chunked Dataset ID</th>
+                                                    <th>Chunked Dataset File Name</th>
+                                                </tr>
+                                            </thead>
+                                            <div id="boxes">
+                                                {% for obj in chunked_dataset_obj %}
+                                                <tr>
+                                                    <th>
+                                                        <label><input class="chunked_dataset_checkbox" type="checkbox" name="chunked_dataset_check" value="{{ obj.uuid }}"/>
+                                                        </label>
+                                                    </th>
+                                                    <th>{{ obj.uuid }}</th>
+                                                    <th>{{ obj.file_name }}</th>
+                                                </tr>
+                                                {% endfor %}
+                                            </div>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading strong"></div>
+                                    <div class="panel-body text-right"></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading strong">Converted Task List</div>
+                                    <table class="table table-hover table-responsive chunked_dataset_table">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>
+                                                    <label><input type="checkbox" id="converted_task_check_all" /></label>
+                                                </th>
+                                                <th>Converted Task ID</th>
+                                                <th>Converted Task File Name</th>
+                                            </tr>
+                                        </thead>
+                                        {% for obj in converted_task_obj %}
+                                        <tr>
+                                            <th>
+                                                <label><input class="converted_task_checkbox" type="checkbox" name="converted_task_check" value="{{ obj.uuid }}"/>
+                                                </label>
+                                            </th>
+                                            <th>{{ obj.uuid }}</th>
+                                            <th>{{ obj.file_name | replace_br:"," | safe }}</th>
+                                        </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>            
+                    </div>
+
+                    {% csrf_token %}
+                    <input name="project_id" value="{{ project_id }}" type="hidden">
+                    <div class="mx-auto" style="width: 200px;">
+                        <button type="submit" class="btn btn-outline-primary">Set Jobs</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-10">
+        <div class="panel panel-default">
+            <div class="panel-heading strong">Job List</div>
+            <form method="POST" name="job_set">
+                <table class="table table-hover table-responsive chunked_dataset_table">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>
+                                <label><input type="checkbox" id="job_check_all"/></label>
+                            </th>
+                            <th>Job ID</th>
+                            <th>Job Status</th>
+                            <th>Chunked Dataset ID</th>
+                            <th></th>
+                            <th>Converted Task ID</th>
+                        </tr>
+                    </thead>
+                    {% for obj in job_obj %}
+                    <tr>
+                        <th>
+                            <label><input class="job_checkbox" type="checkbox" name="job_check" value="{{ obj.uuid }}"/>
+                            </label>
+                        </th>
+                        <th>{{ obj.uuid }}</th>
+                        <th>{{ obj.job_status }}</th>
+                        <th>{{ obj.chunked_dataset_id }}</th>
+                        <th>x</th>
+                        <th>{{ obj.converted_task_id }}</th>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                {% csrf_token %}
+                <input name="project_id" value="{{ project_id }}" type="hidden">
+                <div class="mx-auto" style="width: 200px;">
+                    <button type="submit" class="btn btn-outline-primary" formaction="{% url 'job_ready' %}">
+                        Ready Jobs
+                    </button>
+                    <button type="submit" class="btn btn-outline-warning" formaction="{% url 'job_stop' %}">
+                        Stop Jobs
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

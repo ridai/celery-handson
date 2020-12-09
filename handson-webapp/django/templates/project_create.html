@@ -1,0 +1,20 @@
+{% extends 'base_dashboard.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="login-footer">
+    <p>Project Create</p>
+  </div> 
+  <form action="" method="POST" name="project_create">
+    {% csrf_token %}
+    <div class="project-create-form-label">
+      <label for="name">Project Name</label>
+      <input type="text" id="name" name="name" required="required" />
+    </div>
+    <button type="submit" class="btn btn-outline-primary">Create</button>
+  </form>
+  {% if form.errors %}
+  <p>{{ form.errors }}</p>
+  {% endif %}
+</div>
+{% endblock %}

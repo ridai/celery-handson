@@ -1,0 +1,56 @@
+{% extends 'base_dashboard.html' %}
+{% load filter %}
+
+{% block content %}
+<div class="container">
+    <div class="login-footer">
+        <p>Converted Task List</p>
+    </div>
+    <p>Converted Task List</p>
+    <table class="table table-hover table-responsive">
+        <thead class="thead-light">
+            <tr>
+                <th>Converted Task ID</th>
+                <th>Converted File name</th>
+                <th>Mime type</th>
+                <th>Converted Time</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        {% for obj in object_list %}
+        <tr>
+            <th>{{ obj.uuid }}</th>
+            <th>{{ obj.file_name | replace_br:"," | safe }}</th>
+            <th>{{ obj.mime_type }}</th>
+            <th>{{ obj.converted_time }}</th>
+            <th>
+                <form method="GET" action="{% url 'converted_task_download' %}">
+                    {% csrf_token %}
+                    <input name="project_id" value="{{ project_id }}" type="hidden">
+                    <input name="task_id" value="{{ task_id }}" type="hidden">
+                    <input name="converted_task_id" value="{{ obj.uuid }}" type="hidden">
+                    <button type="submit" class="btn btn-outline-success">Download</button>
+                </form>
+            </th>
+            <th>
+                <form method="POST" action="{% url 'converted_task_delete' %}">
+                    {% csrf_token %}
+                    <input name="project_id" value="{{project_id}}" type="hidden">
+                    <input name="task_id" value="{{ task_id }}" type="hidden">
+                    <input name="converted_task_id" value="{{ obj.uuid }}" type="hidden">
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </form>
+            </th>      
+        </tr>
+        {% endfor %}
+    </table>
+    <form method="POST" action="{% url 'task_convert' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>Convert to WASM</p>
+        <input name="project_id" value="{{project_id}}" type="hidden">
+        <input name="task_id" value="{{task_id}}" type="hidden">
+        <button type="submit" class="btn btn-outline-primary">Convert</button>
+    </form>
+</div>
+{% endblock %}

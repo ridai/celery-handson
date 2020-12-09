@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form action="{% url 'task_step1' %}" method="POST" name="task_step1">
+    <div clss=" d-flex align-items-center">
+        <button class="btn btn-primary btn-block">{{body}}</button>
+    </div>
+</form>
+
+{% endblock %}

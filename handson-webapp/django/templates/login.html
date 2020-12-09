@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<div class="login-container">
+    <div id="output"></div>
+    <div class="avatar"></div>
+    <div class="form-box">
+      <form method="POST" action="" class="login-form">
+        {% csrf_token %}
+        <div class="login-form-label">
+          <label for="username">Login ID(email)</label>
+        </div>
+        <div>
+          <input type="text" id="username" name="username" required="required" />
+        </div>
+        <div class="login-form-label">
+          <label for="password">Password</label></div>
+        <div>
+          <input type="password" id="password" name="password" required="required" />
+        </div>
+  
+        <div class="gen-textalign_center">
+          <button type="submit">
+            <span>Log In</span>
+        </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="login-footer">
+    New to Django Boards? <a href="{% url 'signup' %}">Sign up</a>
+  </div>  
+</div>
+
+{% if form.errors %}
+<p>{{ form.errors }}</p>
+<p>Your email and password didn't match. Please try again.</p>
+{% endif %}
+
+{% endblock %}
