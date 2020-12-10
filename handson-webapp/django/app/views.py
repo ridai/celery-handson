@@ -12,6 +12,8 @@ import redis
 
 from .tasks import hello
 
+from .tasks import hello
+
 # Step1
 @method_decorator(csrf_exempt, name='dispatch')
 class Base(generic.TemplateView):
