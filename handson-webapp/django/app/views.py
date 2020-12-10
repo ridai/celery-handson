@@ -9,6 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import time
 import redis
+import json
+from celery.result import AsyncResult
 
 from .tasks import hello
 
@@ -52,4 +54,23 @@ class TaskStep2(generic.View):
 
     def post(self, request, *args, **kwargs):
         hello.delay("hello world") # 非同期処理を呼び出す場合はdeleyメソッドを叩く
+        return redirect(reverse("base"))
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class TaskStep4(generic.View):
+    """実行中のタスクを全て停止させる
+    Step4: 非同期処理の停止
+    """
+
+    def post(self, request, *args, **kwargs):
+        redis_client = redis.Redis(host='redis', port=6379, db=0)
+        keys = redis_client.keys('*') # 全てのkeyを取得
+        for key in keys:
+            res = redis_client.get(key)
+            if res != None:
+                res = res.decode()
+                res = json.loads(res)
+                task_id = res.get('task_id')
+                AsyncResult(task_id).revoke(terminate=True)
         return redirect(reverse("base"))
