@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import time
+import redis
 
 from .tasks import hello
 
@@ -15,12 +16,19 @@ from .tasks import hello
 @method_decorator(csrf_exempt, name='dispatch')
 class Base(generic.TemplateView):
     """サンプル画面として静的なhtmlを返すだけのシンプルなパターン
+    Step3: 非同期処理の状態を全て取得
     """
 
     template_name = "start_task.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        res = list()
+        redis_client = redis.Redis(host='redis', port=6379, db=0)
+        keys = redis_client.keys('*') # 全てのkeyを取得
+        for key in keys:
+            res.append(redis_client.get(key)) # とりあえず全部格納
+        ctx["task_state"] = res
         return ctx
 
 
