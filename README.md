@@ -110,8 +110,67 @@ $docker-compose up
     CELERY_RESULT_BACKEND = 'redis://redis:6379'
     ```
 2. 非同期スクリプトの実装方法
-    1. manage.pyと同じ階層に、celery.py, tasks.pyを用意する
-    2. celery.pyは以下の内容で記述
-    3. tasks.pyには、非同期で実行させたいpythonコードを好きに書く。この時、デコレータを指定することで非同期スクリプトであると指定する必要がある。
-    4. 上記のtasks.pyを呼び出す。この時、`hoge.delay(args)`と書くことで非同期処理が実行される。
-    
+    1. celery用のdecolaterを事前に読み込むために、`app.__init__.py`に以下内容を記述する
+    ```
+    from __future__ import absolute_import, unicode_literals
+
+    # This will make sure the app is always imported when
+    # Django starts so that shared_task will use this app.
+    from .celery import app as celery_app
+
+    __all__ = ('app',)
+    ```
+    2. appディレクトリ配下に、celery.py, tasks.pyを用意する
+    3. celery.pyは以下の内容で記述。アプリケーションによって、変更と書かれている場所を修正すること。
+    ```
+    # celery.py
+    from __future__ import absolute_import, unicode_literals
+
+    import os
+
+    from celery import Celery
+
+    # set the default Django settings module for the 'celery' program.
+    os.environ.setdefault(
+        'DJANGO_SETTINGS_MODULE',
+        'app.settings' # 変更1: アプリケーションのsettingsを指定
+    )
+
+    app = Celery('app')  # 変更2: appに変更
+
+    # Using a string here means the worker doesn't have to serialize
+    # the configuration object to child processes.
+    # - namespace='CELERY' means all celery-related configuration keys
+    #   should have a `CELERY_` prefix.
+    app.config_from_object(
+        'django.conf:settings',
+        namespace='CELERY'
+    )
+
+    # Load task modules from all registered Django app configs.
+    app.autodiscover_tasks()
+
+
+    @app.task(bind=True)
+    def debug_task(self):
+        print('Request: {0!r}'.format(self.request))
+
+    ```
+    4. tasks.pyには、非同期で実行させたいpythonコードを好きに書く。この時、`@shared_task`デコレータを指定することで非同期スクリプトであると明示する必要がある。
+    ```
+    from __future__ import absolute_import, unicode_literals
+    from celery import shared_task
+
+    import time
+
+    @shared_task
+    def hello(proj_id):
+        time.sleep(10)
+        print('hello')
+    ```
+    5. 上記のtasks.pyをviews.pyから呼び出す。この時、`hoge.delay(args)`と書くことで非同期処理が実行される。
+    ```
+        def post(self, request, *args, **kwargs):
+        hello.delay('hello world') # 非同期処理を呼び出す場合はdeleyメソッドを叩く
+        return redirect(reverse("base"))
+    ```
