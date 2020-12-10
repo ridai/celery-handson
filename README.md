@@ -5,6 +5,7 @@
 1. [Step2](#anchor3)
 1. [Step3](#anchor4)
 1. [Step4](#anchor5)
+1. [動作確認課題](#anchor6)
 
 <a id="anchor1"></a>
 ## 概要
@@ -233,6 +234,10 @@ CELERY_TASK_TRACK_STARTED = True
 ### 概要
 非同期処理を停止してみる
 
+### step3からの差分
+以下を参照
+https://github.com/ridai/celery-handson/pull/4?w=1
+
 ### 手順
 1. 以下のブランチをチェックアウトする
 ```shell
@@ -260,3 +265,8 @@ $docker-compose up
 ```
 AsyncResult(task_id).revoke(terminate=True)
 ```
+
+<a id="anchor6"></a>
+## 動作確認課題
+Task2を複数回クリックしたらどうなるか？
+
