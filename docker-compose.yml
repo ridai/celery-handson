@@ -16,3 +16,29 @@ services:
     hostname: handson-webapp
     ports:
         - 8000:8000
+    depends_on:
+      - redis
+    links:
+      - redis:redis
+
+  redis:
+    image: redis:6.0.9
+
+  celery:
+    build:
+      context: ./handson-webapp
+      args:
+        BUILD_TAG: 3.7
+    container_name: handson-backend
+    image: handson-backend:1.0
+    command: celery -A app worker --concurrency=1 -l info
+    environment:
+      - WORK_DIR=/home/handson-webapp
+      - HOME=/home/handson-webapp
+      - DISPLAY
+      - TZ=Asia/Tokyo
+    hostname: handson-backend
+    depends_on:
+      - redis
+    links:
+      - redis:redis

@@ -1,3 +1,10 @@
 # Django install
 Django==2.2
 django-extensions==2.1.6
+
+# Django-Redis
+django-redis==4.12.1
+
+# Celery
+celery==4.4.7
+django-celery-results==1.2.1
