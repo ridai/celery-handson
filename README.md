@@ -3,6 +3,8 @@
 1. [概要](#anchor1)
 1. [Step1](#anchor2)
 1. [Step2](#anchor3)
+1. [Step3](#anchor4)
+1. [Step4](#anchor5)
 
 <a id="anchor1"></a>
 ## 概要
@@ -180,3 +182,73 @@ handson-backend   | [2020-12-10 01:42:51,138: INFO/ForkPoolWorker-1] Task app.ta
         hello.delay('hello world') # 非同期処理を呼び出す場合はdeleyメソッドを叩く
         return redirect(reverse("base"))
     ```
+
+
+<a id="anchor4"></a>
+## Step.3
+### 概要
+非同期処理の状態を確認してみる
+
+### 手順
+1. 以下のブランチをチェックアウトする
+```shell
+git checkout -b step3 oring/step3
+```
+
+2. 環境を立ち上げる
+```
+$docker-compose build
+$docker-compose up
+```
+
+3. ブラウザで`localhost:8000/handson`にアクセスし、ボタンを押してみる。この時、chromeであればデベロッパーツールでレスポンスをチェックできるようにしておく。
+<img width="500" src="https://user-images.githubusercontent.com/2268153/101715109-30c06d00-3ade-11eb-9897-665255c86a0f.png">
+
+4. Task2をクリックして、task一覧にSTARTEDの状態のタスクが存在することを確認する。表示されない場合はリロード。
+<img width="500" src="https://user-images.githubusercontent.com/2268153/101715293-84cb5180-3ade-11eb-8ea0-cda6bb5e3b53.png">
+
+5.　タスクが完了すると、SUCCESSになることを確認する。確認する際は画面をリロード。
+
+### 解説
+1. taskの実行状態および結果は、settings.pyで指定した`CELERY_RESULT_BACKEND`に格納される。今回はRedisを指定。
+redisに格納されているkeyを全て取得し、valueの値をlist表示しているだけ。
+2. celeryは、デフォルトの状態だとタスクが`STARTED`になったことを検知しないで、`PENDING`ままになってしまう。そこで、settings.pyに以下設定を入れることで対処する。
+```
+CELERY_TASK_TRACK_STARTED = True
+```
+3. 結果に含まれる`task_id`を使えば、任意のタスクの実行状態を確認することも可能である。
+
+
+
+<a id="anchor5"></a>
+## Step.4
+### 概要
+非同期処理を停止してみる
+
+### 手順
+1. 以下のブランチをチェックアウトする
+```shell
+git checkout -b step4 oring/step4
+```
+
+2. 環境を立ち上げる
+```
+$docker-compose build
+$docker-compose up
+```
+
+3. ブラウザで`localhost:8000/handson`にアクセスし、ボタンを押してみる。この時、chromeであればデベロッパーツールでレスポンスをチェックできるようにしておく。
+<img width="500" src="https://user-images.githubusercontent.com/2268153/101715109-30c06d00-3ade-11eb-9897-665255c86a0f.png">
+
+4. Task2をクリックして、task一覧にSTARTEDの状態のタスクが存在することを確認する。表示されない場合はリロード。
+<img width="500" src="https://user-images.githubusercontent.com/2268153/101715293-84cb5180-3ade-11eb-8ea0-cda6bb5e3b53.png">
+
+5.　タスクが完了する前に、`StopAllTasks`ボタンを押し、タスク一覧の中のタスクが`REVOKE`になることを確認する。表示されない場合はリロード。
+<img width="500" src="https://user-images.githubusercontent.com/2268153/101716891-906c4780-3ae1-11eb-86b7-50608764b240.png">
+
+
+### 解説
+1. celeryのクラスである`AsyncResult`を用いると、task_idを指定して以下メソッドでタスクを停止させることができる。この時、`terminate`を指定しないと再起動時にタスクが再実行される（らしい？）ため、きちんと止めておく。
+```
+AsyncResult(task_id).revoke(terminate=True)
+```
