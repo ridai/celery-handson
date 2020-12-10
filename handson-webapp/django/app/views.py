@@ -56,7 +56,6 @@ class TaskStep2(generic.View):
         hello.delay("hello world") # 非同期処理を呼び出す場合はdeleyメソッドを叩く
         return redirect(reverse("base"))
 
-
 @method_decorator(csrf_exempt, name='dispatch')
 class TaskStep4(generic.View):
     """実行中のタスクを全て停止させる
