@@ -193,6 +193,10 @@ handson-backend   | [2020-12-10 01:42:51,138: INFO/ForkPoolWorker-1] Task app.ta
 ### 概要
 非同期処理の状態を確認してみる
 
+### step2からの差分
+以下を参照
+https://github.com/ridai/celery-handson/pull/3/?w=1
+
 ### 手順
 1. 以下のブランチをチェックアウトする
 ```shell
