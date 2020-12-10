@@ -12,5 +12,20 @@
         <button class="btn btn-primary btn-block">Step2</button>
     </div>
 </form>
+<br>
+<table class="table table-hover table-responsive">
+    <thead class="thead-light">
+    <tr>
+      <th></th>
+      <th>task</th>
+      <th></th>
+    </tr>
+    </thead>
+    {% for obj in task_state %}
+    <tr>
+      <th>{{ obj }}</th>
+    </tr>
+    {% endfor %}
+</table>
 
 {% endblock %}
