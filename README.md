@@ -60,6 +60,10 @@ backendサーバでのtask実行結果を格納する必要がある。今回は
 
 また、今回も、動作の説明のために、djangoのserverを **シングルスレッド** かつ **1プロセス** での動作を行っている。
 
+### step1からの差分
+以下PR参照
+https://github.com/ridai/celery-handson/pull/2/?w=1
+
 ### 手順
 1. 以下のブランチをチェックアウトする
 ```shell
