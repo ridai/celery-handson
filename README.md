@@ -75,6 +75,12 @@ $docker-compose up
 
 4. Buttonをクリックして、レスポンスが即時返ることを確認する
 
+5. docker logを確認すると、10秒遅れて非同期処理が終わった旨のメッセージが流れていることが確認できる
+```
+handson-backend   | [2020-12-10 01:42:51,129: WARNING/ForkPoolWorker-1] hello world
+handson-backend   | [2020-12-10 01:42:51,138: INFO/ForkPoolWorker-1] Task app.tasks.hello[6cee6185-7bfb-48b4-9c54-3a083a9d0836] succeeded in 10.011956540000028s: None
+```
+
 ### 解説
 1. 非同期処理の導入手順
     1. Redisをbrokerとして利用するため、redis serviceを用意する。
