@@ -31,13 +31,13 @@ services:
         BUILD_TAG: 3.7
     container_name: handson-backend
     image: handson-backend:1.0
-    command: celery -A nodeai_app worker --concurrency=1 -l info
+    command: celery -A app worker --concurrency=1 -l info
     environment:
       - WORK_DIR=/home/handson-webapp
       - HOME=/home/handson-webapp
       - DISPLAY
       - TZ=Asia/Tokyo
-    hostname: handson-webapp
+    hostname: handson-backend
     depends_on:
       - redis
     links:

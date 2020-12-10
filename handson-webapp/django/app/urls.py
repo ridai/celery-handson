@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("handson", views.Base.as_view(), name="base"),
     path("handson/task_step1", views.TaskStep1.as_view(), name="task_step1"),
+    path("handson/task_step2", views.TaskStep2.as_view(), name="task_step2"),
 ]
