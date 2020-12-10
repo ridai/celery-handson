@@ -268,5 +268,9 @@ AsyncResult(task_id).revoke(terminate=True)
 
 <a id="anchor6"></a>
 ## 動作確認課題
+
+### 1
 Task2を複数回クリックしたらどうなるか？
 
+### 2
+docker-compose downでコンテナを完全に落とした場合、タスクのキュー情報はどうなっているか？
